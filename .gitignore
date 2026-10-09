@@ -16,4 +16,6 @@ dist/
 *.log
 .neon
 .agents/
-skills-lock.json
+skills-lock.jsonneon.ts
+/package.json
+/package-lock.json
