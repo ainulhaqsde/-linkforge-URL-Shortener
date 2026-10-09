@@ -1,0 +1,13 @@
+
+{
+  "rewrites": [
+    {
+      "source": "/:code((?!analytics$|api$|health$)[a-zA-Z0-9_-]{3,20})",
+      "destination": "https://linkforge-url-api-ainuldev.vercel.app/:code"
+    },
+    {
+      "source": "/analytics/:shortCode",
+      "destination": "/index.html"
+    }
+  ]
+}
