@@ -1,3 +1,4 @@
+
 import { pool } from "./db.js";
 import { logger } from "./logger.js";
 
@@ -13,16 +14,23 @@ export async function processBatch(messages) {
 
     for (const message of messages) {
       const fields = message.message;
-
       const shortCode = fields.short_code;
-
       const timestamp = new Date(fields.timestamp);
 
+      if (
+        !shortCode ||
+        Number.isNaN(timestamp.getTime())
+      ) {
+        throw new Error("Invalid analytics event");
+      }
+
       const hourBucket = new Date(timestamp);
+      hourBucket.setUTCMinutes(0, 0, 0);
 
-      hourBucket.setMinutes(0, 0, 0);
-
-      const key = `${shortCode}_${hourBucket.toISOString()}`;
+      const key = JSON.stringify([
+        shortCode,
+        hourBucket.toISOString()
+      ]);
 
       aggregationMap.set(
         key,
@@ -31,7 +39,7 @@ export async function processBatch(messages) {
     }
 
     for (const [key, clicks] of aggregationMap.entries()) {
-      const [shortCode, hourBucket] = key.split("_");
+      const [shortCode, hourBucket] = JSON.parse(key);
 
       await client.query(
         `
@@ -44,7 +52,7 @@ export async function processBatch(messages) {
         ON CONFLICT (short_code, hour_bucket)
         DO UPDATE SET
           clicks = analytics_hourly.clicks + EXCLUDED.clicks
-      `,
+        `,
         [shortCode, hourBucket, clicks]
       );
 
@@ -53,7 +61,7 @@ export async function processBatch(messages) {
         UPDATE urls
         SET click_count = click_count + $1
         WHERE short_code = $2
-      `,
+        `,
         [clicks, shortCode]
       );
     }
@@ -65,9 +73,7 @@ export async function processBatch(messages) {
     );
   } catch (err) {
     await client.query("ROLLBACK");
-
     logger.error("Batch processing failed:", err);
-
     throw err;
   } finally {
     client.release();
