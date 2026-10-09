@@ -47,14 +47,6 @@ Inspired by modern link management platforms such as Bitly and TinyURL.
 
 ---
 
-## 🖼️ Preview
-
-Add a screenshot of the live LinkForge interface to the repository as `screenshot.png` to display it here.
-
-![LinkForge Preview](./screenshot.png)
-
----
-
 ## 🛠️ Technologies Used
 
 | Technology | Purpose |
