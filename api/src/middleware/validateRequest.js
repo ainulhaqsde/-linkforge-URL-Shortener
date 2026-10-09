@@ -27,7 +27,7 @@ export function validateShortenRequest(req, res, next) {
     ) {
       return res.status(400).json({
         success: false,
-        message: "Custom code must be 3–20 letters, numbers, underscores or hyphens."
+        message: "Custom code must be 3 to 20 letters, numbers, underscores or hyphens."
       });
     }
   }
