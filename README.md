@@ -1,447 +1,342 @@
-# Distributed URL Shortener — Enhanced by Ainul Haq
+# 🔗 LinkForge — Distributed URL Shortener
 
-**Maintained and enhanced by Ainul Haq (2026).**
+![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=white)
+![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-black?logo=vercel)
+![Status](https://img.shields.io/badge/Status-Live-brightgreen)
 
-See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for Windows VS Code, GitHub, and online deployment instructions. See [AUTHOR.md](AUTHOR.md) for copyright and attribution details.
+A modern **Distributed URL Shortener** built using **React, Node.js, Express.js, PostgreSQL, and Redis**, combining fast URL shortening, custom aliases, QR code generation, database persistence, Redis caching, and a responsive web interface.
 
----
+Inspired by modern link management platforms such as Bitly and TinyURL.
 
-# Distributed URL Shortener
-
-A production-grade distributed URL shortener inspired by Bitly and TinyURL.
-
-This project demonstrates:
-- Distributed system design
-- Collision-resistant ID generation
-- Redis read-through caching
-- Redis Streams analytics pipeline
-- Background worker processing
-- Real-time analytics dashboard
-- Dockerized microservices architecture
-- High-throughput benchmarking
+> **Shorter Links. Smarter Infrastructure.**
 
 ---
 
-# Architecture Overview
+## 🚀 Live Demo
 
-## Components
+🌐 **[Launch LinkForge](https://linkforge-url-shortener-ainuldev.vercel.app/)**
 
-### API Service
-Responsible for:
-- URL shortening
-- Redirect handling
-- Redis cache integration
-- Publishing analytics events
+🔗 **[Backend API](https://linkforge-url-api-ainuldev.vercel.app/health)**
 
-### PostgreSQL
-Persistent source of truth for:
-- URL mappings
-- Aggregated analytics
-
-### Redis
-Used for:
-- Read-through cache
-- Redis Streams event queue
-
-### Analytics Worker
-Consumes Redis Stream events asynchronously and aggregates analytics.
-
-### Frontend
-React + Vite dashboard for:
-- Creating short URLs
-- Viewing analytics charts
+💻 **[GitHub Repository](https://github.com/ainulhaqsde/-linkforge-URL-Shortener)**
 
 ---
 
-# System Architecture
+## ✨ Features
+
+- 🔗 **Instant URL Shortening** — Convert long URLs into short, shareable links.
+- 🎯 **Custom Short Links** — Create personalized URL aliases.
+- 📱 **QR Code Generation** — Generate QR codes for shortened URLs.
+- ⚡ **Fast Redirection** — Redirect visitors to original destinations.
+- 🗄️ **PostgreSQL Database** — Persistent storage for URL mappings.
+- 🚀 **Redis Caching** — Reduce repeated database queries.
+- 🧠 **Distributed ID Generation** — Snowflake-inspired and hash-based strategies.
+- 🔒 **Input Validation** — Validate URLs and custom aliases.
+- 🎨 **Modern UI** — Clean, user-friendly React interface.
+- 📊 **Analytics Dashboard** — Interface for viewing link statistics.
+- 📱 **Responsive Design** — Supports desktop, laptop, tablet, and mobile layouts.
+- ☁️ **Cloud Deployment** — Frontend and backend hosted on Vercel.
+- 🐳 **Docker Support** — Container-based development configuration.
+- 🧩 **Modular Architecture** — Separate frontend, API, and worker services.
+
+**Note:** The analytics background worker is implemented but not deployed, so live click statistics are not currently operational.
+
+---
+
+## 🖼️ Preview
+
+Add a screenshot of the live LinkForge interface to the repository as `screenshot.png` to display it here.
+
+![LinkForge Preview](./screenshot.png)
+
+---
+
+## 🛠️ Technologies Used
+
+| Technology | Purpose |
+|---|---|
+| React.js | Frontend user interface |
+| Vite | Frontend development and build |
+| JavaScript | Application logic |
+| Node.js | Backend runtime |
+| Express.js | REST API |
+| PostgreSQL | Persistent database |
+| Neon | PostgreSQL cloud hosting |
+| Redis | Caching and event streaming |
+| Redis Cloud | Managed Redis service |
+| Docker | Containerization |
+| Vercel | Frontend and API deployment |
+| Git & GitHub | Version control |
+
+---
+
+## 🏗️ System Architecture
 
 ```text
-                ┌─────────────────┐
-                │   React Client  │
-                └────────┬────────┘
-                         │
-                         ▼
-                ┌─────────────────┐
-                │   API Service   │
-                └────────┬────────┘
-                         │
-         ┌───────────────┴───────────────┐
-         ▼                               ▼
- ┌──────────────┐               ┌────────────────┐
- │ Redis Cache  │               │ PostgreSQL DB  │
- └──────────────┘               └────────────────┘
-         │
-         ▼
- ┌────────────────┐
- │ Redis Streams  │
- └────────┬───────┘
-          ▼
- ┌────────────────┐
- │ Worker Service │
- └────────────────┘
+                 ┌──────────────────┐
+                 │  React Frontend  │
+                 │      Vercel      │
+                 └────────┬─────────┘
+                          │
+                          ▼
+                 ┌──────────────────┐
+                 │   Express API    │
+                 │      Vercel      │
+                 └────────┬─────────┘
+                          │
+             ┌────────────┴────────────┐
+             │                         │
+             ▼                         ▼
+     ┌──────────────┐          ┌──────────────┐
+     │ Redis Cloud  │          │ Neon         │
+     │ Cache        │          │ PostgreSQL   │
+     └──────────────┘          └──────────────┘
+             │
+             ▼
+     ┌──────────────────┐
+     │  Redis Streams   │
+     └────────┬─────────┘
+              │
+              ▼
+     ┌──────────────────┐
+     │ Analytics Worker │
+     │ (Not Deployed)   │
+     └──────────────────┘
 ```
 
 ---
 
-# Distributed Systems Concepts
+## ⚡ How LinkForge Works
 
-## Why Auto Increment Fails
-
-Auto-increment IDs create:
-- Centralized bottlenecks
-- Lock contention
-- Single points of failure
-- Poor horizontal scalability
-
-This project avoids those issues using:
-- Hash-based IDs
-- Snowflake-inspired distributed IDs
+1. 🔗 Enter a long URL into the input field.
+2. 🎯 Optionally choose a custom short-code alias.
+3. 🚀 Click the button to generate a shortened URL.
+4. 🗄️ LinkForge stores the mapping in PostgreSQL.
+5. 📋 Copy the shortened link or share its QR code.
+6. 🌐 Opening the link redirects visitors to the original destination.
+7. ⚡ Redis caching helps speed up repeated lookups.
 
 ---
 
-# Snowflake ID Strategy
+## 🧠 Distributed Systems Concepts
 
-Structure:
+LinkForge demonstrates several backend engineering concepts:
 
-```text
-(timestamp << 22) | (node_id << 12) | sequence
-```
+- **Distributed ID Generation:** Short-code generation without relying exclusively on sequential database IDs.
+- **Redis Caching:** Cache-first URL lookups to reduce database load.
+- **Stateless API Design:** Architecture suitable for scaling API instances.
+- **Event-Driven Processing:** Redis Streams-based analytics event pipeline.
+- **Background Workers:** Separate service for processing click events.
+- **Database Persistence:** Reliable storage of URL mappings.
 
-Advantages:
-- Distributed-safe
-- Collision resistant
-- Time sortable
-- No centralized coordinator
-
----
-
-# Hash Strategy
-
-Uses:
-- SHA256 hashing
-- Base62 encoding
-- Collision retry handling
-
-Advantages:
-- Deterministic
-- Simple
-- Compact short codes
+The event-processing worker is available in the source code but requires separate deployment.
 
 ---
 
-# Redis Read-Through Cache
-
-Redirect flow:
-
-1. Request arrives
-2. Redis checked first
-3. Cache HIT:
-   - redirect immediately
-4. Cache MISS:
-   - fetch from PostgreSQL
-   - populate Redis
-   - redirect
-
-Response headers:
+## 📂 Project Structure
 
 ```text
-X-Cache-Status: HIT
-```
-
-or
-
-```text
-X-Cache-Status: MISS
+Distributed-URL-Shortener-Ainul-Haq/
+│
+├── api/                  # Express.js backend
+├── frontend/             # React + Vite frontend
+├── worker/               # Analytics worker
+├── db/                   # Database resources
+├── load-test/            # Performance testing
+│
+├── docker-compose.yml    # Container configuration
+├── README.md             # Project documentation
+├── DEPLOYMENT_GUIDE.md   # Deployment instructions
+├── AUTHOR.md             # Attribution information
+└── BENCHMARK.md          # Benchmark documentation
 ```
 
 ---
 
-# Redis Streams Analytics Pipeline
+## ⚙️ Installation & Setup
 
-Analytics are asynchronous.
-
-Redirect requests publish click events into Redis Streams.
-
-Worker service:
-- consumes events
-- batches processing
-- aggregates hourly clicks
-- updates PostgreSQL
-
-This keeps redirects ultra-fast.
-
----
-
-# Project Structure
-
-```text
-distributed-url-shortener/
-├── api/
-├── worker/
-├── frontend/
-├── db/
-├── load-test/
-├── docker-compose.yml
-├── README.md
-└── BENCHMARK.md
-```
-
----
-
-# Setup Instructions
-
-## 1. Install Docker
-
-Install Docker Desktop.
-
-Verify:
+### 1. Clone the Repository
 
 ```bash
-docker --version
-docker compose version
+git clone https://github.com/ainulhaqsde/-linkforge-URL-Shortener.git
 ```
 
----
-
-# Clone Project
+### 2. Open the Project
 
 ```bash
-git clone <your-repo-url>
-
-cd distributed-url-shortener
+cd -linkforge-URL-Shortener
 ```
 
----
+### 3. Install Backend Dependencies
 
-# Environment Variables
+```bash
+cd api
+npm install
+```
 
-Create `.env` in root:
+### 4. Configure Environment Variables
+
+Create an `.env` file for the backend using the configuration expected by the application.
+
+Example:
 
 ```env
-POSTGRES_DB=url_shortener
-
-POSTGRES_USER=postgres
-
-POSTGRES_PASSWORD=postgres
-
-DATABASE_URL=postgresql://postgres:postgres@postgres:5432/url_shortener
-
-REDIS_URL=redis://redis:6379
-
-API_PORT=5000
-
-NODE_ID=1
-
+DATABASE_URL=your_postgresql_connection_string
+REDIS_URL=your_redis_connection_string
 BASE_URL=http://localhost:5000
-
-CACHE_TTL=86400
-
+NODE_ID=1
 REDIS_STREAM_NAME=click_events
-
 REDIS_CONSUMER_GROUP=analytics-group
 ```
 
----
+Never upload actual credentials or `.env` files to GitHub.
 
-# Run Entire System
-
-```bash
-docker compose up --build
-```
-
----
-
-# Verify Running Containers
+### 5. Start the Backend
 
 ```bash
-docker ps
+npm start
 ```
 
-Expected containers:
-- postgres
-- redis
-- api
-- worker
+### 6. Start the Frontend
+
+Open another terminal in the project root:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open the local URL displayed by Vite.
+
+For complete setup instructions, see [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md).
 
 ---
 
-# Frontend
+## 🌐 API Endpoints
 
-Open:
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/health` | API health check |
+| POST | `/api/shorten` | Create a shortened URL |
+| GET | `/:shortCode` | Redirect to original URL |
+| GET | `/api/analytics/:shortCode` | Retrieve analytics data |
+
+### Example URL Shortening Request
+
+```json
+{
+  "url": "https://www.example.com",
+  "strategy": "snowflake"
+}
+```
+
+### Example Shortened URL
 
 ```text
-http://localhost:3000
+https://linkforge-url-shortener-ainuldev.vercel.app/abc123
 ```
+
+The short code shown is illustrative.
 
 ---
 
-# API Endpoints
+## 📊 Analytics
 
-## Health Check
+The repository includes an analytics subsystem designed to:
 
-```http
-GET /health
-```
+- Record URL click events.
+- Publish events through Redis Streams.
+- Process events using a background worker.
+- Aggregate click counts hourly.
+- Display statistics in the analytics dashboard.
 
-Response:
-
-```json
-{
-  "status": "ok"
-}
-```
+**Current status:** The analytics worker is not deployed, so live analytics are not fully functional on the hosted website.
 
 ---
 
-# Create Short URL
+## 📱 Responsive Design
 
-```http
-POST /api/shorten
-```
+LinkForge is designed for use across:
 
-Request:
+- 💻 Desktop
+- 🖥️ Laptop
+- 📱 Tablet
+- 📲 Mobile
 
-```json
-{
-  "url": "https://google.com",
-  "strategy": "snowflake"
-}
-```
-
-Response:
-
-```json
-{
-  "success": true,
-  "short_url": "http://localhost:5000/abc123",
-  "short_code": "abc123",
-  "strategy": "snowflake"
-}
-```
+The frontend uses React to provide an interactive link-shortening experience.
 
 ---
 
-# Redirect
+## ☁️ Deployment
 
-```http
-GET /abc123
-```
+| Service | Hosting Platform |
+|---|---|
+| Frontend | Vercel |
+| Backend API | Vercel |
+| PostgreSQL Database | Neon |
+| Redis Cache | Redis Cloud |
 
-Returns:
-- 302 redirect
-- cache headers
+**Live Website:** https://linkforge-url-shortener-ainuldev.vercel.app/
 
----
+**API:** https://linkforge-url-api-ainuldev.vercel.app/
 
-# Analytics
-
-```http
-GET /api/analytics/abc123
-```
-
-Response:
-
-```json
-{
-  "total_clicks": 100,
-  "history": [
-    {
-      "hour_bucket": "2026-05-16T10:00:00Z",
-      "clicks": 25
-    }
-  ]
-}
-```
+The analytics worker remains an optional undeployed service.
 
 ---
 
-# Benchmarking
+## 🔮 Future Improvements
 
-Install k6.
-
-macOS:
-
-```bash
-brew install k6
-```
-
-Ubuntu:
-
-```bash
-sudo apt install k6
-```
-
-Run:
-
-```bash
-k6 run load-test/k6-script.js
-```
+- 📊 Fully operational real-time analytics.
+- 👤 User accounts and authentication.
+- 🗂️ Personal link management dashboard.
+- ⏳ Custom URL expiration controls.
+- 🌍 Geographic and device analytics.
+- 🛡️ Advanced rate limiting and abuse prevention.
+- 📈 Enhanced performance monitoring.
+- ⚙️ Automated CI/CD testing.
+- ☁️ Multi-region deployment support.
 
 ---
 
-# Scaling Discussion
+## 👨‍💻 Developer
 
-## Horizontal Scaling
+**Enhanced & Maintained by Ainul Haq**
 
-API service can scale horizontally because:
-- stateless architecture
-- distributed IDs
-- Redis shared cache
-- PostgreSQL pooling
+Full-Stack Development | Backend Engineering | Distributed Systems
 
----
+🌐 **Portfolio:** [portfolio-ainuldev.vercel.app](https://portfolio-ainuldev.vercel.app/)
 
-# Future Improvements
+💻 **GitHub:** [github.com/ainulhaqsde](https://github.com/ainulhaqsde)
 
-Potential production enhancements:
-- Kubernetes deployment
-- Kafka instead of Redis Streams
-- CDN integration
-- Geo-replication
-- Multi-region support
-- Advanced analytics
-- URL expiration cleanup jobs
+🔗 **Project:** [LinkForge Repository](https://github.com/ainulhaqsde/-linkforge-URL-Shortener)
+
+For project attribution and copyright details, see [AUTHOR.md](AUTHOR.md).
 
 ---
 
-# Troubleshooting
+## 📜 License & Attribution
 
-## Docker Build Errors
+This project is documented as MIT-licensed. See the repository's `LICENSE` file for the applicable terms.
 
-Rebuild:
-
-```bash
-docker compose up --build
-```
+Original contributions and third-party attribution requirements remain subject to the project history and license notices.
 
 ---
 
-# Remove Containers
+## ⭐ Support
 
-```bash
-docker compose down -v
-```
+If you find LinkForge useful or interesting, consider giving the GitHub repository a ⭐ to support future improvements.
 
 ---
 
-# View Logs
+# 🔗 LinkForge
 
-```bash
-docker compose logs -f
-```
+### Shorter Links. Smarter Infrastructure.
 
----
+**Enhanced & Maintained by Ainul Haq | © 2026**
 
-# Screenshots
-
-Add screenshots here:
-- Frontend UI
-- Docker containers
-- Benchmark output
-- Analytics charts
-
----
-
-# License
-
-MIT
+*Building scalable web applications with modern backend engineering.*
