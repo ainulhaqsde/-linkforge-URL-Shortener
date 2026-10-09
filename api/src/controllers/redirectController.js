@@ -1,3 +1,4 @@
+
 import { getCache, setCache } from "../services/cacheService.js";
 import { getUrlByCode } from "../services/urlService.js";
 import { publishClickEvent } from "../services/analyticsPublisher.js";
@@ -6,16 +7,19 @@ export async function redirectUrl(req, res, next) {
   try {
     const { shortCode } = req.params;
 
+    // Check Redis cache first
     const cached = await getCache(shortCode);
 
     if (cached) {
       res.setHeader("X-Cache-Status", "HIT");
 
-      publishClickEvent(shortCode, req);
+      // Publish click event before redirecting
+      await publishClickEvent(shortCode, req);
 
       return res.redirect(cached);
     }
 
+    // Look up URL in PostgreSQL
     const data = await getUrlByCode(shortCode);
 
     if (!data) {
@@ -25,13 +29,17 @@ export async function redirectUrl(req, res, next) {
       });
     }
 
-    if (!data.expires_at) await setCache(shortCode, data.original_url);
+    // Cache non-expiring URLs
+    if (!data.expires_at) {
+      await setCache(shortCode, data.original_url);
+    }
 
     res.setHeader("X-Cache-Status", "MISS");
 
-    publishClickEvent(shortCode, req);
+    // Publish click event before redirecting
+    await publishClickEvent(shortCode, req);
 
-    res.redirect(data.original_url);
+    return res.redirect(data.original_url);
   } catch (err) {
     next(err);
   }
